@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sequential Burst Animation</title>
+  <title>Responsive Burst Animation</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       background: black;
       overflow: hidden;
-     
-
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     .container {
-         
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 400px;
-      height: 100vh;
+      width: 90vw;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
       overflow: hidden;
       pointer-events: none;
     }
@@ -50,37 +52,47 @@
 
     .logo {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
-      width: 100px;
+      bottom: 2vw;
+      right: 2vw;
+      width: 10vw;
+      max-width: 100px;
       height: auto;
       opacity: 1;
       transform: scale(0.5);
       z-index: 10;
       pointer-events: none;
     }
-    .insta-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-  opacity: 0;
-  z-index: 5;
-  pointer-events: none;
-}
 
+    .insta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+      opacity: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 95vw;
+        aspect-ratio: 1 / 1;
+      }
+
+      .logo {
+        width: 15vw;
+      }
+    }
   </style>
 </head>
 <body>
 
   <!-- 🔊 Background Music -->
   <audio id="bgMusic" autoplay muted loop>
-  <source src="tema-minimal-house-334334.mp3" type="audio/mpeg" />
-</audio>
-
-
+    <source src="tema-minimal-house-334334.mp3" type="audio/mpeg" />
+  </audio>
 
   <!-- 🖼️ Product Containers -->
   <div class="container" id="product1">
@@ -99,8 +111,7 @@
     <img src="product3.jpg" class="layer blur-heavy" />
     <img src="product3.jpg" class="layer blur-light" />
     <img src="product3.jpg" class="layer sharp-bordered" />
-    <!-- 🎯 Logo always visible in bottom-right -->
-     <div class="insta-bg" id="instaBackground"></div>
+    <div class="insta-bg" id="instaBackground"></div>
     <img src="logo.png" class="logo" id="finalLogo" />
   </div>
 
@@ -108,20 +119,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script>
     const containers = document.querySelectorAll('.container');
-const masterTimeline = gsap.timeline();
+    const masterTimeline = gsap.timeline();
 
-containers.forEach((container, index) => {
-  const layers = container.querySelectorAll('.layer');
+    containers.forEach((container, index) => {
+      const layers = container.querySelectorAll('.layer');
 
-  const tl = gsap.timeline();
+      const tl = gsap.timeline();
 
-  tl.to(layers[0], { opacity: 1, scale: 1.2, duration: 1, ease: "power2.out" })
-    .to(layers[1], { opacity: 1, scale: 1.1, duration: 1, ease: "power2.out" }, "-=0.8")
-    .to(layers[2], { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.6");
+      tl.to(layers[0], { opacity: 1, scale: 1.2, duration: 1, ease: "power2.out" })
+        .to(layers[1], { opacity: 1, scale: 1.1, duration: 1, ease: "power2.out" }, "-=0.8")
+        .to(layers[2], { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.6");
 
-  // ❌ Removed fade-out step
-  masterTimeline.add(tl, `+=1`);
-});
+      masterTimeline.add(tl, `+=1`);
+    });
 
     // 🎯 Animate logo to center after all products
     masterTimeline.to("#finalLogo", {
@@ -133,29 +143,27 @@ containers.forEach((container, index) => {
       duration: 1.2,
       ease: "power2.out"
     });
+
+    // 🎨 Animate background
+    masterTimeline.to("#instaBackground", {
+      opacity: 1,
+      duration: 0.5,
+      ease: "power2.out"
+    });
+
+    // 🔊 Unmute and play music
     window.addEventListener("DOMContentLoaded", () => {
-    const bgMusic = document.getElementById("bgMusic");
+      const bgMusic = document.getElementById("bgMusic");
+      bgMusic.muted = false;
+      const playPromise = bgMusic.play();
 
-    // Try to unmute and play
-    bgMusic.muted = false;
-    const playPromise = bgMusic.play();
-
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log("Audio started");
-        })
-        .catch(error => {
-          console.warn("Autoplay blocked:", error);
-        });
-    }
-  });
-// Animate background and logo together
-masterTimeline.to("#instaBackground", {
-  opacity: 1,
-  duration: 0.5,
-  ease: "power2.out"
-}, );  </script>
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => console.log("Audio started"))
+          .catch(error => console.warn("Autoplay blocked:", error));
+      }
+    });
+  </script>
 
 </body>
 </html>

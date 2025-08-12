@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sequential Burst Animation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+     
+
+    }
+
+    .container {
+         
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 100vh;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .layer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+    }
+
+    .blur-heavy { filter: blur(30px); }
+    .blur-light { filter: blur(10px); }
+
+    .sharp-bordered {
+      filter: blur(0);
+      border: 2px solid white;
+      width: 90%;
+      height: 90%;
+      border-radius: 8px;
+    }
+
+    .logo {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 100px;
+      height: auto;
+      opacity: 1;
+      transform: scale(0.5);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .insta-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- 🔊 Background Music -->
+  <audio id="bgMusic" autoplay muted loop>
+  <source src="tema-minimal-house-334334.mp3" type="audio/mpeg" />
+</audio>
+
+
+
+  <!-- 🖼️ Product Containers -->
+  <div class="container" id="product1">
+    <img src="product1.webp" class="layer blur-heavy" />
+    <img src="product1.webp" class="layer blur-light" />
+    <img src="product1.webp" class="layer sharp-bordered" />
+  </div>
+
+  <div class="container" id="product2">
+    <img src="product2.avif" class="layer blur-heavy" />
+    <img src="product2.avif" class="layer blur-light" />
+    <img src="product2.avif" class="layer sharp-bordered" />
+  </div>
+
+  <div class="container" id="product3">
+    <img src="product3.jpg" class="layer blur-heavy" />
+    <img src="product3.jpg" class="layer blur-light" />
+    <img src="product3.jpg" class="layer sharp-bordered" />
+    <!-- 🎯 Logo always visible in bottom-right -->
+     <div class="insta-bg" id="instaBackground"></div>
+    <img src="logo.png" class="logo" id="finalLogo" />
+  </div>
+
+  <!-- 🚀 GSAP Animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script>
+    const containers = document.querySelectorAll('.container');
+const masterTimeline = gsap.timeline();
+
+containers.forEach((container, index) => {
+  const layers = container.querySelectorAll('.layer');
+
+  const tl = gsap.timeline();
+
+  tl.to(layers[0], { opacity: 1, scale: 1.2, duration: 1, ease: "power2.out" })
+    .to(layers[1], { opacity: 1, scale: 1.1, duration: 1, ease: "power2.out" }, "-=0.8")
+    .to(layers[2], { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, "-=0.6");
+
+  // ❌ Removed fade-out step
+  masterTimeline.add(tl, `+=1`);
+});
+
+    // 🎯 Animate logo to center after all products
+    masterTimeline.to("#finalLogo", {
+      bottom: "50%",
+      right: "50%",
+      x: "50%",
+      y: "50%",
+      scale: 1,
+      duration: 1.2,
+      ease: "power2.out"
+    });
+    window.addEventListener("DOMContentLoaded", () => {
+    const bgMusic = document.getElementById("bgMusic");
+
+    // Try to unmute and play
+    bgMusic.muted = false;
+    const playPromise = bgMusic.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          console.log("Audio started");
+        })
+        .catch(error => {
+          console.warn("Autoplay blocked:", error);
+        });
+    }
+  });
+// Animate background and logo together
+masterTimeline.to("#instaBackground", {
+  opacity: 1,
+  duration: 0.5,
+  ease: "power2.out"
+}, );  </script>
+
+</body>
+</html>
